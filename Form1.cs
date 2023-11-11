@@ -224,10 +224,21 @@ namespace arkanoid
                 Rectangle rectPieza = piezas[i].Bounds;
                 if (rectBala.IntersectsWith(rectPieza))
                 {
-                    panelPiezas.Controls.Remove(piezas[i]);
-                    piezas[i].Enabled = false;
-                   // CalcularColisionBala(piezas[i]);
-                    LblBala.VelocidadY = -LblBala.VelocidadY;
+                    if (piezas[i].Location.X == LblBala.Location.X)
+                    {
+                        panelPiezas.Controls.Remove(piezas[i]);
+                        piezas[i].Enabled = false;
+                        // CalcularColisionBala(piezas[i]);
+                        LblBala.VelocidadX = -LblBala.VelocidadX;
+                    }
+                    else
+                    {
+                        panelPiezas.Controls.Remove(piezas[i]);
+                        piezas[i].Enabled = false;
+                        // CalcularColisionBala(piezas[i]);
+                        LblBala.VelocidadY = -LblBala.VelocidadY;
+                    }
+                    
                 }
             }
 
