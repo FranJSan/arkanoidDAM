@@ -1,0 +1,11 @@
+C:\Users\fran_\source\repos\arkanoid\bin\Debug\arkanoid.exe.config
+C:\Users\fran_\source\repos\arkanoid\bin\Debug\arkanoid.exe
+C:\Users\fran_\source\repos\arkanoid\bin\Debug\arkanoid.pdb
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.csproj.AssemblyReference.cache
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.FrmMain.resources
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.Properties.Resources.resources
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.csproj.GenerateResource.cache
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.csproj.CoreCompileInputs.cache
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.exe
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.pdb
+C:\Users\fran_\source\repos\arkanoid\obj\Debug\arkanoid.FrmGameOver.resources
