@@ -37,7 +37,7 @@ namespace arkanoid
 
         public Nave()
         {
-            Size = new Size(80, 15);
+            Size = new Size(90, 15);
             BackColor = Color.Green;
             Visible = true;
             Velocidad = 5;

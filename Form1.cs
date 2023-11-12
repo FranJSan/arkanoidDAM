@@ -30,9 +30,6 @@ namespace arkanoid
         {
             InitializeComponent();
             panelPiezas.MouseMove += new MouseEventHandler(SeguirMouse);
-
-            panelLimite.MouseMove += new MouseEventHandler(SeguirMouse);
-
             panelPiezas.Padding = new Padding(300);
             CrearNave();
             CrearPiezas();
@@ -93,7 +90,8 @@ namespace arkanoid
         {
             LblNave = new Nave();
             LblNave.Left = this.Width / 2 - LblNave.Width / 2;
-            panelLimite.Controls.Add(LblNave);
+            LblNave.Top = panelPiezas.Width - LblNave.Height - 100;
+            panelPiezas.Controls.Add(LblNave);
         }
 
         public void CrearBala()
@@ -116,18 +114,17 @@ namespace arkanoid
             }
         }
         private void BorrarVidas()
-        {         
+        {
             foreach (Vida vida in panelPiezas.Controls.OfType<Vida>().ToList())
             {
-                vida.Visible = false;
                 panelPiezas.Controls.Remove(vida);
-            }                        
+            }
         }
 
         private void TimerMain_Tick(object sender, EventArgs e)
         {
-            ColisionPieza();
             MoverBala();
+            ColisionPieza();
         }
 
         private void ResetGame()
@@ -136,26 +133,25 @@ namespace arkanoid
             {
                 LblNave.Vidas --;
                 BorrarVidas();
-                CrearBala();
                 DibujarVidas();
+                CrearBala();
             }
             else
             {
                 FrmGameOver FrmGO = new FrmGameOver();
                 TimerMain.Stop();
                 FrmGO.ShowDialog();
-                TimerMain.Start();
                 
                 if (reset)
                 {
-                    panelLimite.Controls.Clear();
                     panelPiezas.Controls.Clear();
                     CrearNave();
                     CrearPiezas();
                     CrearBala();
                     DibujarVidas();
-                    TimerMain.Start();
                     reset = false;
+                    gameOver = false;
+                    TimerMain.Start();
                 }
                 
             }            
@@ -179,10 +175,9 @@ namespace arkanoid
             CalcularColisionBala(LblNave);
 
             // Fin de juego
-            if (LblBala.Location.Y > panelPiezas.Height)
+            if (LblBala.Location.Y >= panelPiezas.Height)
             {
-                ResetGame();
-                gameOver = true;
+                ResetGame();                
             }
             
         }
@@ -192,10 +187,9 @@ namespace arkanoid
             // Colisión Nave
             Rectangle nave = label.Bounds;
             Rectangle bala = LblBala.Bounds;
-            Point supIzq = panelLimite.PointToClient(panelPiezas.PointToScreen(bala.Location));
-            Rectangle transBala = new Rectangle(supIzq, bala.Size);
+            
 
-            if (nave.IntersectsWith(transBala))
+            if (nave.IntersectsWith(bala))
             {
                 // Con esto a veces la bala hace cosas raras por el centro de la nave
                 // double relativeIntersection = (nave.X - bala.X + (bala.Width / 2));
