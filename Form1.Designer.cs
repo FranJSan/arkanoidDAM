@@ -53,7 +53,7 @@ namespace arkanoid
             // 
             // TimerMain
             // 
-            this.TimerMain.Interval = 50;
+            this.TimerMain.Interval = 40;
             this.TimerMain.Tick += new System.EventHandler(this.TimerMain_Tick);
             // 
             // FrmMain

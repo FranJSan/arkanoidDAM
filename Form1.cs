@@ -30,8 +30,9 @@ namespace arkanoid
         {
             InitializeComponent();
             panelPiezas.MouseMove += new MouseEventHandler(SeguirMouse);
+
             panelLimite.MouseMove += new MouseEventHandler(SeguirMouse);
-            
+
             panelPiezas.Padding = new Padding(300);
             CrearNave();
             CrearPiezas();
@@ -199,9 +200,18 @@ namespace arkanoid
                 // Con esto a veces la bala hace cosas raras por el centro de la nave
                 // double relativeIntersection = (nave.X - bala.X + (bala.Width / 2));
 
-                double relativeIntersection = (nave.X - bala.X);
+                double relativeIntersection =  (nave.X + nave.Width / 2) - (bala.X + bala.Width / 2);
 
-                double newAngle = (relativeIntersection / (nave.Width / 2)) * Math.PI / 4;
+                /*
+                 * Calcular el nuevo ángulo ha sido costoso. He tenido que tirar de ayuda de IA y luego ir ajustando los valores 
+                 * hasta obtener un calculo esperado. La idea es dividir la nave en dos mitades, calcular el punto en X de intersección
+                 * para saber a que distancia del centro ha golpeado la bala. Cuanto más lejos, mayor será el nuevo ángulo en dirección
+                 * contraria a la que venía la bala. Cuando más al centro pegue la bala, el rebote tenderá a ser de 90º
+                 * 
+                 * Para ello, calculo el punto de intersección relativa: nave.X - bala.X. Esto dará siempre un número negativo. 
+                 * */
+
+                double newAngle = (relativeIntersection) * Math.PI / 4;
 
                 LblBala.VelocidadX = LblBala.Speed * Math.Cos(newAngle);
                 LblBala.VelocidadY = LblBala.Speed * Math.Sin(newAngle);
