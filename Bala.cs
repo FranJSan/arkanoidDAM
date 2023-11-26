@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ namespace arkanoid
                 return speed;
             }
         }
+
+        private double Angulo;
 
         private double velocidadX;
         public double VelocidadX
@@ -60,13 +63,45 @@ namespace arkanoid
             BorderStyle = BorderStyle.None;
             BackColor = Color.Red;
             speed = 10;
+            Angulo = 50 * Math.PI / 180;
             EstablecerVelocidadEjes();
         }
 
-        private void EstablecerVelocidadEjes()
+        public void SetAnguloGrados (double anguloGrados)
         {
-            velocidadX = speed * Math.Cos(60 * Math.PI / 180);
-            velocidadY = speed * Math.Sin(60 * Math.PI / 180);
+            Angulo = anguloGrados * Math.PI / 180;
+        }
+
+        public void SetAnguloRad (double anguloRadianes)
+        {
+            Angulo = anguloRadianes;
+        }
+
+        public double GetAnguloGrados ()
+        {
+            return Angulo * 180 / Math.PI;
+        }
+
+        public double GetAnguloRad ()
+        {
+            return Angulo;
+        }
+        public void EstablecerVelocidadEjes()
+        {
+            velocidadX = speed * Math.Cos(Angulo);
+            velocidadY = speed * Math.Sin(Angulo);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            using (var path = new GraphicsPath())
+            {
+                path.AddEllipse(ClientRectangle);
+                Region = new Region(path);
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                e.Graphics.DrawEllipse(new Pen(ForeColor, 1), ClientRectangle);
+            }
         }
     }
 }

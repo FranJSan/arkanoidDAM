@@ -13,10 +13,10 @@ namespace arkanoid
         public Vida()
         {
             AutoSize = false;
-            Width = 20;
-            Height = 20;
+            Width = 30;
+            Height = 5;
             TextAlign = ContentAlignment.MiddleCenter;
-            BackColor = Color.Yellow;
+            BackColor = Color.Green;
         }
     }
 }

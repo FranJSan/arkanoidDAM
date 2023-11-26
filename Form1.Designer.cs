@@ -30,25 +30,16 @@ namespace arkanoid
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.panelLimite = new System.Windows.Forms.Panel();
             this.panelPiezas = new System.Windows.Forms.Panel();
             this.TimerMain = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
-            // 
-            // panelLimite
-            // 
-            this.panelLimite.BackColor = System.Drawing.Color.Navy;
-            this.panelLimite.Location = new System.Drawing.Point(0, 502);
-            this.panelLimite.Name = "panelLimite";
-            this.panelLimite.Size = new System.Drawing.Size(614, 63);
-            this.panelLimite.TabIndex = 0;
             // 
             // panelPiezas
             // 
             this.panelPiezas.BackColor = System.Drawing.Color.Navy;
             this.panelPiezas.Location = new System.Drawing.Point(0, -1);
             this.panelPiezas.Name = "panelPiezas";
-            this.panelPiezas.Size = new System.Drawing.Size(614, 506);
+            this.panelPiezas.Size = new System.Drawing.Size(614, 568);
             this.panelPiezas.TabIndex = 1;
             // 
             // TimerMain
@@ -62,7 +53,6 @@ namespace arkanoid
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(612, 564);
-            this.Controls.Add(this.panelLimite);
             this.Controls.Add(this.panelPiezas);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -75,8 +65,6 @@ namespace arkanoid
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel panelLimite;
         private System.Windows.Forms.Panel panelPiezas;
         private System.Windows.Forms.Timer TimerMain;
     }
