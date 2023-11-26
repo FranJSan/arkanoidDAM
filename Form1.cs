@@ -10,10 +10,9 @@ using System.Windows.Forms;
 
 
 /*
- * todo: mejorar el rebote
- *       intentar quitar la vibración
+ * todo: mejorar el rebote con la nave y con los bloques
+ *       en oocasiones da la casualidad de que la bala rebota indefinidamente entre las dos paredes
  *       mejorar estética
- *       implementar fin bala / partida
  *       
  */
 namespace arkanoid
@@ -113,7 +112,7 @@ namespace arkanoid
                 panelPiezas.Controls.Add(vida);
             }
         }
-        private void BorrarVidas()
+        private void BorrarVida()
         {
             foreach (Vida vida in panelPiezas.Controls.OfType<Vida>().ToList())
             {
@@ -132,7 +131,7 @@ namespace arkanoid
             if (LblNave.Vidas > 0 && !gameOver)
             {
                 LblNave.Vidas --;
-                BorrarVidas();
+                BorrarVida();
                 DibujarVidas();
                 CrearBala();
             }
@@ -191,24 +190,64 @@ namespace arkanoid
 
             if (nave.IntersectsWith(bala))
             {
+                TimerMain.Stop();
+                LblBala.Enabled = false;
                 // Con esto a veces la bala hace cosas raras por el centro de la nave
                 // double relativeIntersection = (nave.X - bala.X + (bala.Width / 2));
 
-                double relativeIntersection =  (nave.X + nave.Width / 2) - (bala.X + bala.Width / 2);
+                //double relativeIntersectionX =  ((nave.X + nave.Width) / 2) - (bala.X);
+                //double relativeIntersectionY = (nave.Y) - ((bala.Y + bala.Height) / 2);
+
+
+
 
                 /*
                  * Calcular el nuevo ángulo ha sido costoso. He tenido que tirar de ayuda de IA y luego ir ajustando los valores 
-                 * hasta obtener un calculo esperado. La idea es dividir la nave en dos mitades, calcular el punto en X de intersección
+                 * hasta obtener un calculo esperado. La idea es dividir la nave en dos mitades, calcular el punto de intersección
                  * para saber a que distancia del centro ha golpeado la bala. Cuanto más lejos, mayor será el nuevo ángulo en dirección
                  * contraria a la que venía la bala. Cuando más al centro pegue la bala, el rebote tenderá a ser de 90º
                  * 
-                 * Para ello, calculo el punto de intersección relativa: nave.X - bala.X. Esto dará siempre un número negativo. 
-                 * */
+                 * He conseguido el rebote aceptable tras muchas y muchas pruebas y corrección del código. Este es el que de momento
+                 * ha dado mejor resulado
+                 * 
+                 */
+                
+                // Calcular intersección en X e Y y hayar el ángulo de la tangente. En Y será constante, el rebote siempre es a
+                // a la misma altura, y X variará según la intersección de la bala.
+                double relativeIntersectionX = ((nave.X + nave.Width / 2) - (bala.X + bala.Width / 2)) / (bala.Width / 2);
+                double relativeIntersectionY = ((bala.Y + bala.Height / 2) - (nave.Y + nave.Height / 2)) / (bala.Height / 2);
+                double newAngle = Math.Atan2(relativeIntersectionX, relativeIntersectionY);
 
-                double newAngle = (relativeIntersection) * Math.PI / 4;
+                newAngle = (newAngle + Math.PI) % (2 * Math.PI) - Math.PI/2;
+                
+                LblBala.SetAnguloRad(newAngle);
+                LblBala.EstablecerVelocidadEjes();
 
-                LblBala.VelocidadX = LblBala.Speed * Math.Cos(newAngle);
-                LblBala.VelocidadY = LblBala.Speed * Math.Sin(newAngle);
+                    //  LblBala.VelocidadX = LblBala.Speed * Math.Cos(newAngle);
+                      //LblBala.VelocidadY = LblBala.Speed * Math.Sin(newAngle);
+
+                /*
+                double normalX = (nave.Left + nave.Width / 2) - (bala.Left + bala.Width / 2);
+                double normalY = (nave.Top + nave.Height / 2) - (bala.Top + bala.Height / 2);
+
+                // Normalizar la normal
+                double length = Math.Sqrt(normalX * normalX + normalY * normalY);
+                normalX /= length;
+                normalY /= length;
+
+                // Calcular el producto escalar entre la velocidad de la bala y la normal
+                double dotProduct = LblBala.VelocidadX * normalX + LblBala.VelocidadY * normalY;
+
+                // Calcular el vector de reflexión
+                double reflectX = LblBala.VelocidadX - 2 * dotProduct * normalX;
+                double reflectY = LblBala.VelocidadY - 2 * dotProduct * normalY;
+
+                // Asignar el nuevo vector de velocidad reflejado
+                LblBala.VelocidadX = reflectX;
+                LblBala.VelocidadY = -reflectY;
+                */
+                LblBala.Enabled = true;
+                TimerMain.Start();
             }
 
             LblBala.Location = new Point((int)(LblBala.Location.X + LblBala.VelocidadX), (int)(LblBala.Location.Y + LblBala.VelocidadY));

@@ -40,7 +40,7 @@ namespace arkanoid
             Size = new Size(90, 15);
             BackColor = Color.Green;
             Visible = true;
-            Velocidad = 5;
+            Velocidad = 6;
             vidas = 2;
         }
 
