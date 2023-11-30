@@ -38,7 +38,8 @@ namespace arkanoid
             CrearBala();
             DibujarPuntuacion();
             DibujarVidas();
-            TimerMain.Start();            
+            TimerMain.Start();
+            
         }
 
         private void SeguirMouse(object sender, MouseEventArgs e)
@@ -85,6 +86,7 @@ namespace arkanoid
                 piezas[i].Left = columna * (piezas[i].Width + 15) + 40;
 
                 piezas[i].Visible = true;
+                piezas[i].MouseMove += new MouseEventHandler(SeguirMouse);
                 panelPiezas.Controls.Add(piezas[i]); 
             }
         }
@@ -95,15 +97,16 @@ namespace arkanoid
             LblNave.Left = this.Width / 2 - LblNave.Width / 2;
             LblNave.Top = panelPiezas.Width - LblNave.Height - 100;
             panelPiezas.Controls.Add(LblNave);
+            LblNave.MouseMove += new MouseEventHandler(SeguirMouse);
         }
 
         public void CrearBala()
         {
             LblBala = new Bala();
             LblBala.Location = new Point(this.Width / 2, this.Height / 2);
-            panelPiezas.Controls.Add(LblBala);
-            
+            panelPiezas.Controls.Add(LblBala);            
         }
+
         private void DibujarVidas()
         {
             if (LblNave.Vidas == 0) return;
@@ -224,7 +227,7 @@ namespace arkanoid
                  * Calcular el nuevo ángulo ha muy sido dificil. He tenido que tirar de ayuda de IA y otras fuentes y luego ir ajustando 
                  * los valores hasta obtener un resultado aceptable. 
                  * La idea es dividir la nave en dos mitades y calcular el punto de intersección para saber a que distancia del centro 
-                 * ha golpeado la bala. Cuanto más lejos, más cerrado será el nuevo ángulo en dirección externa a la nave. Cuanto más 
+                 * ha golpeado la bala. Cuanto más lejos, más cerrado/abierto será el nuevo ángulo en dirección externa a la nave. Cuanto más 
                  * al centro pegue la bala, el rebote tenderá a ser de 90º.
                  * 
                  * He conseguido el rebote aceptable tras muchas y muchas pruebas y corrección del código. Este es el que de momento
@@ -233,11 +236,9 @@ namespace arkanoid
                  */
 
                 // Calcular intersección en X e Y y hayar el ángulo de la tangente. En Y será constante, el rebote siempre es a
-                // a la misma altura, y X variará según la intersección de la bala.
+                // a la misma altura, y X variará según la intersección de la bala. Se normaliza respecto a la anchura/altura de la bala.
 
-
-                double relativeIntersectionX = ((nave.X + nave.Width / 2) - (bala.X + bala.Width / 2)) / (bala.Width / 2);
-                
+                double relativeIntersectionX = ((nave.X + nave.Width / 2) - (bala.X + bala.Width / 2)) / (bala.Width / 2);                
                 double relativeIntersectionY = ((bala.Y + bala.Height / 2) - (nave.Y + nave.Height / 2)) / (bala.Height / 2);
                
 
@@ -246,7 +247,12 @@ namespace arkanoid
 
                 newAngle = (newAngle + Math.PI) % (2 * Math.PI) - Math.PI/2; // Normalizo el ángulo y lo roto
 
-
+                /*
+                if (newAngle >= 8 * Math.PI / 10)
+                {
+                    newAngle = -Math.PI/2;
+                } 
+                */
                 LblBala.SetAnguloRad(newAngle);
                 LblBala.EstablecerVelocidadEjes();
             }
@@ -277,9 +283,6 @@ namespace arkanoid
                         piezas[i].Enabled = false;
                         incrementarPuntos();
                         LblBala.VelocidadX = -LblBala.VelocidadX;
-                        
-
-
                     }
                     else
                     {
