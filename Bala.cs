@@ -57,8 +57,8 @@ namespace arkanoid
         public Bala()
         {
             AutoSize = false;
-            Width = 20;
-            Height = 20;
+            Width = 15;
+            Height = 15;
             TextAlign = ContentAlignment.MiddleCenter;
             BorderStyle = BorderStyle.None;
             BackColor = Color.Red;

@@ -15,6 +15,10 @@ namespace arkanoid
         public FrmGameOver()
         {
             InitializeComponent();
+            StartPosition = FormStartPosition.CenterParent;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            FormBorderStyle = FormBorderStyle.None;
+           
         }
 
         private void button1_Click(object sender, EventArgs e)

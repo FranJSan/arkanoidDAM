@@ -10,8 +10,9 @@ using System.Windows.Forms;
 
 
 /*
- * todo: mejorar el rebote con la nave y con los bloques
- *       en oocasiones da la casualidad de que la bala rebota indefinidamente entre las dos paredes
+ * todo: mejorar el rebote con la nave y con los bloques -> en oocasiones da la casualidad de que la bala rebota 
+ *       indefinidamente entre las dos paredes, sobretodo cuando rebota con la esquina de la nave y cerca de una
+ *       pared.
  *       mejorar estética
  *       
  */
@@ -24,6 +25,8 @@ namespace arkanoid
         private Nave LblNave;
         private Bala LblBala;
         private bool gameOver = false;
+        Label score;
+        private int puntos = 0;
 
         public FrmMain()
         {
@@ -33,8 +36,10 @@ namespace arkanoid
             CrearNave();
             CrearPiezas();
             CrearBala();
+            DibujarPuntuacion();
             DibujarVidas();
-            TimerMain.Start();            
+            TimerMain.Start();
+            
         }
 
         private void SeguirMouse(object sender, MouseEventArgs e)
@@ -81,6 +86,7 @@ namespace arkanoid
                 piezas[i].Left = columna * (piezas[i].Width + 15) + 40;
 
                 piezas[i].Visible = true;
+                piezas[i].MouseMove += new MouseEventHandler(SeguirMouse);
                 panelPiezas.Controls.Add(piezas[i]); 
             }
         }
@@ -91,15 +97,16 @@ namespace arkanoid
             LblNave.Left = this.Width / 2 - LblNave.Width / 2;
             LblNave.Top = panelPiezas.Width - LblNave.Height - 100;
             panelPiezas.Controls.Add(LblNave);
+            LblNave.MouseMove += new MouseEventHandler(SeguirMouse);
         }
 
         public void CrearBala()
         {
             LblBala = new Bala();
             LblBala.Location = new Point(this.Width / 2, this.Height / 2);
-            panelPiezas.Controls.Add(LblBala);
-            
+            panelPiezas.Controls.Add(LblBala);            
         }
+
         private void DibujarVidas()
         {
             if (LblNave.Vidas == 0) return;
@@ -111,6 +118,30 @@ namespace arkanoid
                 vida.Left = 10 + ((vida.Width + 20) * i);
                 panelPiezas.Controls.Add(vida);
             }
+        }
+
+        private void DibujarPuntuacion()
+        {
+            Label puntuacion = new Label();
+            puntuacion.Width = 140;
+            puntuacion.Text = "Puntuación: ";
+            puntuacion.ForeColor = Color.White;
+            puntuacion.Font = new Font(puntuacion.Font.FontFamily, 18f);
+
+            score = new Label();
+            score.Text = puntos.ToString();
+            score.Width = 50;
+            score.ForeColor = Color.White;
+            score.Font = new Font(score.Font.FontFamily, 18f);
+
+            puntuacion.Top = 10;
+            puntuacion.Left = this.Width - puntuacion.Width - score.Width - 35;
+            score.Top = 10;
+            score.Left = this.Width - score.Width - 15;
+            score.TextAlign = ContentAlignment.MiddleCenter;
+
+            panelPiezas.Controls.Add(puntuacion);
+            panelPiezas.Controls.Add(score);
         }
         private void BorrarVida()
         {
@@ -150,6 +181,7 @@ namespace arkanoid
                     DibujarVidas();
                     reset = false;
                     gameOver = false;
+                    puntos = 0;
                     TimerMain.Start();
                 }
                 
@@ -190,64 +222,39 @@ namespace arkanoid
 
             if (nave.IntersectsWith(bala))
             {
-                TimerMain.Stop();
-                LblBala.Enabled = false;
-                // Con esto a veces la bala hace cosas raras por el centro de la nave
-                // double relativeIntersection = (nave.X - bala.X + (bala.Width / 2));
-
-                //double relativeIntersectionX =  ((nave.X + nave.Width) / 2) - (bala.X);
-                //double relativeIntersectionY = (nave.Y) - ((bala.Y + bala.Height) / 2);
-
-
-
 
                 /*
-                 * Calcular el nuevo ángulo ha sido costoso. He tenido que tirar de ayuda de IA y luego ir ajustando los valores 
-                 * hasta obtener un calculo esperado. La idea es dividir la nave en dos mitades, calcular el punto de intersección
-                 * para saber a que distancia del centro ha golpeado la bala. Cuanto más lejos, mayor será el nuevo ángulo en dirección
-                 * contraria a la que venía la bala. Cuando más al centro pegue la bala, el rebote tenderá a ser de 90º
+                 * Calcular el nuevo ángulo ha muy sido dificil. He tenido que tirar de ayuda de IA y otras fuentes y luego ir ajustando 
+                 * los valores hasta obtener un resultado aceptable. 
+                 * La idea es dividir la nave en dos mitades y calcular el punto de intersección para saber a que distancia del centro 
+                 * ha golpeado la bala. Cuanto más lejos, más cerrado/abierto será el nuevo ángulo en dirección externa a la nave. Cuanto más 
+                 * al centro pegue la bala, el rebote tenderá a ser de 90º.
                  * 
                  * He conseguido el rebote aceptable tras muchas y muchas pruebas y corrección del código. Este es el que de momento
-                 * ha dado mejor resulado
+                 * ha dado mejor resulado.
                  * 
                  */
-                
+
                 // Calcular intersección en X e Y y hayar el ángulo de la tangente. En Y será constante, el rebote siempre es a
-                // a la misma altura, y X variará según la intersección de la bala.
-                double relativeIntersectionX = ((nave.X + nave.Width / 2) - (bala.X + bala.Width / 2)) / (bala.Width / 2);
+                // a la misma altura, y X variará según la intersección de la bala. Se normaliza respecto a la anchura/altura de la bala.
+
+                double relativeIntersectionX = ((nave.X + nave.Width / 2) - (bala.X + bala.Width / 2)) / (bala.Width / 2);                
                 double relativeIntersectionY = ((bala.Y + bala.Height / 2) - (nave.Y + nave.Height / 2)) / (bala.Height / 2);
-                double newAngle = Math.Atan2(relativeIntersectionX, relativeIntersectionY);
+               
 
-                newAngle = (newAngle + Math.PI) % (2 * Math.PI) - Math.PI/2;
-                
-                LblBala.SetAnguloRad(newAngle);
-                LblBala.EstablecerVelocidadEjes();
+                double newAngle = Math.Atan2(relativeIntersectionX, relativeIntersectionY); // Se que estoy intercambiando los puntos
+                                                                                            // pero es como funciona ¿?
 
-                    //  LblBala.VelocidadX = LblBala.Speed * Math.Cos(newAngle);
-                      //LblBala.VelocidadY = LblBala.Speed * Math.Sin(newAngle);
+                newAngle = (newAngle + Math.PI) % (2 * Math.PI) - Math.PI/2; // Normalizo el ángulo y lo roto
 
                 /*
-                double normalX = (nave.Left + nave.Width / 2) - (bala.Left + bala.Width / 2);
-                double normalY = (nave.Top + nave.Height / 2) - (bala.Top + bala.Height / 2);
-
-                // Normalizar la normal
-                double length = Math.Sqrt(normalX * normalX + normalY * normalY);
-                normalX /= length;
-                normalY /= length;
-
-                // Calcular el producto escalar entre la velocidad de la bala y la normal
-                double dotProduct = LblBala.VelocidadX * normalX + LblBala.VelocidadY * normalY;
-
-                // Calcular el vector de reflexión
-                double reflectX = LblBala.VelocidadX - 2 * dotProduct * normalX;
-                double reflectY = LblBala.VelocidadY - 2 * dotProduct * normalY;
-
-                // Asignar el nuevo vector de velocidad reflejado
-                LblBala.VelocidadX = reflectX;
-                LblBala.VelocidadY = -reflectY;
+                if (newAngle >= 8 * Math.PI / 10)
+                {
+                    newAngle = -Math.PI/2;
+                } 
                 */
-                LblBala.Enabled = true;
-                TimerMain.Start();
+                LblBala.SetAnguloRad(newAngle);
+                LblBala.EstablecerVelocidadEjes();
             }
 
             LblBala.Location = new Point((int)(LblBala.Location.X + LblBala.VelocidadX), (int)(LblBala.Location.Y + LblBala.VelocidadY));
@@ -263,26 +270,33 @@ namespace arkanoid
             for (int i = 0; i < piezas.Length; i++) 
             {
                 if (piezas[i].Enabled == false) continue;
+
+                
                 Rectangle rectBala = LblBala.Bounds;
                 Rectangle rectPieza = piezas[i].Bounds;
                 if (rectBala.IntersectsWith(rectPieza))
                 {
+                    
                     if (piezas[i].Location.X == LblBala.Location.X)
                     {
                         panelPiezas.Controls.Remove(piezas[i]);
                         piezas[i].Enabled = false;
-                        // CalcularColisionBala(piezas[i]);
+                        incrementarPuntos();
                         LblBala.VelocidadX = -LblBala.VelocidadX;
                     }
                     else
                     {
                         panelPiezas.Controls.Remove(piezas[i]);
                         piezas[i].Enabled = false;
-                        // CalcularColisionBala(piezas[i]);
-                        LblBala.VelocidadY = -LblBala.VelocidadY;
+                        incrementarPuntos();
+                        LblBala.VelocidadY = -LblBala.VelocidadY;                        
+
                     }
                     
                 }
+
+                
+               
             }
 
             if (IsEmptyPiezas())
@@ -293,6 +307,10 @@ namespace arkanoid
             }
         }
 
-        
+        private void incrementarPuntos()
+        {
+            puntos++;
+            score.Text = puntos.ToString();
+        }
     }
 }
